@@ -134,13 +134,13 @@ export default function Home() {
                                 {!isChecking &&
                                     (isValid ? (
                                         <Image
-                                            src={'/../public/img/valid.png'}
+                                            src={'/img/valid.png'}
                                             height='30'
                                             width='30'
                                         />
                                     ) : (
                                         <Image
-                                            src={'/../public/img/invalid.png'}
+                                            src={'/img/invalid.png'}
                                             height='30'
                                             width='30'
                                         />
