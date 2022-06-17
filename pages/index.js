@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import Blockies from "react-blockies";
 import {
   Avatar,
+  Link,
   Grid,
   Paper,
   Typography,
@@ -15,7 +16,6 @@ import {
   Skeleton,
   LinearProgress,
   Box,
-  TextField,
 } from "@mui/material";
 import Web3 from "web3";
 import softwareContractABI from "../abi/SoftwareTest.json";
@@ -47,91 +47,116 @@ export default function Home() {
   const [isChecking, setIsChecking] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
-  const { softwareContractAdr, redirectURI } = router.query;
-  const [wallet, setWallet] = useState({ email: "", address: "" });
+  // const { softwareContractAdr, redirectURI } = router.query;
+  const [wallet, setWallet] = useState({
+    email: "",
+    address: "",
+    softwareAdr: "",
+  });
   // console.log("Request: ,", req);
+  // if (softwareContractAdr === undefined || redirectURI === undefined)
+  let softwareContractAdr, redirectURI;
+
+  // useEffect(() => {
+  //   if (!router.isReady) return;
+  //   softwareContractAdr = router.query.softwareContractAdr;
+  //   redirectURI = router.query.redirectURI;
+  // }, [router.isReady]);
 
   useEffect(() => {
-    const timeoutIds = [];
-    portis.showPortis();
-    function showPortisTimer() {
-      console.log("Show portis function");
-      portis
-        .isLoggedIn()
-        .then((res) => {
-          if (res.result === false) {
-            setLoading(true);
-            portis.showPortis();
-            timeoutIds.push(setTimeout(showPortisTimer, 1000));
-          } else {
-            setLoading(false);
-          }
-        })
-        .catch((err) => {
-          setLoading(false);
-          console.error("An error occured:\n", error);
-        });
-    }
-    showPortisTimer();
-    const web3 = new Web3(portis.provider);
-    let softwareContract = null;
-    try {
-      console.log("software Address: ", softwareContractAdr);
-      softwareContract = new web3.eth.Contract(
-        softwareContractABI,
-        softwareContractAdr
-      );
-    } catch (error) {
-      console.error(error);
-    }
-
-    console.log(softwareContract);
-    portis.onLogin((walletAddress, email, reputation) => {
-      setWallet({
-        email,
-        address: web3.utils.toChecksumAddress(walletAddress),
-      });
-      if (softwareContract === null) {
+    if (!router.isReady) return;
+    softwareContractAdr = router.query.softwareContractAdr;
+    redirectURI = router.query.redirectURI;
+    if (softwareContractAdr !== undefined && redirectURI !== undefined) {
+      const web3 = new Web3(portis.provider);
+      let softwareContract = null;
+      try {
+        softwareContract = new web3.eth.Contract(
+          softwareContractABI,
+          softwareContractAdr
+        );
+      } catch (error) {
+        setError("Invalid software address");
+        setLoading(false);
+        console.log("Initial contract error: ", error);
         return;
       }
 
-      // let message = '';
-      console.log("Logged in, with address:", walletAddress);
-      // signedMessage = '';
-      setIsChecking(true);
-      softwareContract.methods
-        .check_license_v2()
-        .call({ from: walletAddress })
-        .then(async (isAdrValid) => {
-          if (isAdrValid) {
-            setIsValid(true);
-          } else {
-            setIsValid(false);
-          }
-          setIsChecking(false);
-          await fetch(redirectURI, {
-            method: "POST",
-            mode: "no-cors",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ is_valid: isAdrValid }),
+      const timeoutIds = [];
+      portis.showPortis();
+      function showPortisTimer() {
+        portis
+          .isLoggedIn()
+          .then((res) => {
+            if (res.result === false) {
+              setLoading(true);
+              portis.showPortis();
+              timeoutIds.push(setTimeout(showPortisTimer, 1000));
+            } else {
+              setLoading(false);
+            }
           })
-            .then((res) => console.log(res))
-            .catch((err) => {
-              console.log("FETCH ERR: ", err);
-            });
-        })
-        .catch((error) => {
-          console.error("An error ocurred:\n", error);
-        });
-    });
-    return () => {
-      for (let i = 0; i < timeoutIds.length; i++) {
-        window.clearTimeout(timeoutIds[i]);
+          .catch((err) => {
+            setLoading(false);
+            setError("Login error");
+
+            console.error("An error occurred:\n", err);
+          });
       }
-    };
-  }, [softwareContractAdr, portis]);
+      showPortisTimer();
+
+      if (
+        softwareContract !== null &&
+        softwareContract._address !== null &&
+        error === null
+      ) {
+        portis.onLogin((walletAddress, email, reputation) => {
+          setWallet({
+            email,
+            address: web3.utils.toChecksumAddress(walletAddress),
+            softwareAdr: softwareContract._address,
+          });
+
+          setIsChecking(true);
+          softwareContract.methods
+            .check_license_v2()
+            .call({ from: walletAddress })
+            .then(async (isAdrValid) => {
+              if (isAdrValid) {
+                setIsValid(true);
+              } else {
+                setIsValid(false);
+              }
+              setIsChecking(false);
+              await fetch(redirectURI, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ is_valid: isAdrValid }),
+              })
+                .then((res) => console.log(res))
+                .catch((err) => {
+                  console.log("FETCH ERR: ", err);
+                });
+            })
+            .catch((error) => {
+              console.error("An error ocurred:\n", error);
+            });
+        });
+      }
+      return () => {
+        for (let i = 0; i < timeoutIds.length; i++) {
+          window.clearTimeout(timeoutIds[i]);
+        }
+      };
+    } else {
+      // router.push("/404");
+      setLoading(false);
+      setError("Invalid parameters");
+    }
+  }, [softwareContractAdr, portis, router.isReady]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -143,10 +168,6 @@ export default function Home() {
           <title>License Validator</title>
           <meta name="description" content="Generated by create next app" />
           <link rel="icon" href="/favicon.ico" />
-          {/* <link
-          href="../asset/EuclidCircularBMedium/EuclidCircularB-Medium.ttf"
-          rel="stylesheet"
-        /> */}
         </Head>
 
         <main className={styles.main}>
@@ -155,30 +176,17 @@ export default function Home() {
           </h1>
 
           {loading ? (
-            // <p>Loading...</p>
-            // <CircularProgress color="primary" />
             <Box sx={{ width: "100%" }}>
               <LinearProgress color="secondary" />
             </Box>
-          ) : (
+          ) : !error ? (
             <>
-              {softwareContractAdr && (
+              {wallet.softwareAdr && (
                 <>
                   <Typography variant="h4" color="common.white">
                     Software Address
                   </Typography>
-                  {/* <Typography color="common.white">
-                    {softwareContractAdr}
-                  </Typography> */}
-                  {/* <TextField
-                    id="filled-read-only-input"
-                    // label="Read Only"
-                    defaultValue={softwareContractAdr}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                    variant="filled"
-                  /> */}
+
                   <Box
                     style={{
                       border: "1px solid grey",
@@ -190,7 +198,7 @@ export default function Home() {
                     }}
                   >
                     <p style={{ padding: 0, margin: 0, color: "white" }}>
-                      {softwareContractAdr}
+                      {wallet.softwareAdr}
                     </p>
                   </Box>
                 </>
@@ -202,7 +210,7 @@ export default function Home() {
                       backgroundImage:
                         "linear-gradient(to right bottom, #6a5af9, #f62682)",
                       height: 200,
-                      width: 700,
+
                       borderRadius: "16px",
                       padding: 3,
                       marginTop: 30,
@@ -213,7 +221,6 @@ export default function Home() {
                         p: 4,
                         margin: "auto",
                         borderRadius: "inherit",
-                        // flexGrow: 1,
                         backgroundColor: "rgb(44 44 57)",
                       }}
                       style={{ height: "100%", width: "100%" }}
@@ -243,13 +250,13 @@ export default function Home() {
                           {!isChecking ? (
                             isValid ? (
                               <Image
-                                src={"/img/valid.png"}
+                                src={"/img/icons8-ok-96.png"}
                                 height="30"
                                 width="30"
                               />
                             ) : (
                               <Image
-                                src={"/img/invalid.png"}
+                                src={"/img/icons8-cancel-48.png"}
                                 height="30"
                                 width="30"
                               />
@@ -258,10 +265,6 @@ export default function Home() {
                             <Box style={{ height: "30", width: "30" }}>
                               <CircularProgress color="secondary" />
                             </Box>
-                            // <button
-                            //   style={{ height: "30", width: "30" }}
-                            //   hidden
-                            // ></button>
                           )}
                         </Grid>
                       </Grid>
@@ -281,7 +284,46 @@ export default function Home() {
                   }}
                 />
               )}
+              <Box style={{ height: 50, marginTop: 30 }}>
+                {!isChecking &&
+                  (isValid ? (
+                    <Typography variant="h4" color="green">
+                      Now you can close this page and use your application.
+                    </Typography>
+                  ) : (
+                    <Typography variant="h4" color="red">
+                      You have no valid license.{" "}
+                      <Link
+                        href={`https://softwarelicenseblockchainmain.gtsb.io/?software=${wallet.softwareAdr}`}
+                        underline="always"
+                      >
+                        Click here to buy!
+                      </Link>
+                    </Typography>
+                  ))}
+              </Box>
             </>
+          ) : (
+            <Paper
+              sx={{
+                display: "flex",
+                padding: "20px 70px",
+                fontSize: 30,
+
+                alignItems: "center",
+                color: "rgb(95, 33, 32)",
+
+                backgroundColor: "rgb(253, 237, 237)",
+              }}
+            >
+              <Image
+                src={"/img/icons8-high-priority-96.png"}
+                height="60"
+                width="60"
+              />
+
+              {` ERROR: ${error}`}
+            </Paper>
           )}
         </main>
       </div>
