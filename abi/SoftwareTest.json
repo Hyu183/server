@@ -2,6 +2,75 @@
     {
         "inputs": [
             {
+                "internalType": "uint256",
+                "name": "_licenseId",
+                "type": "uint256"
+            }
+        ],
+        "name": "buyResaleLicense",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "numCycles",
+                "type": "uint256"
+            }
+        ],
+        "name": "createLicense",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "softwareAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "issue_timestamp",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "expiration_timestamp",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address payable",
+                        "name": "owner",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isForResale",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "resalePrice",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct Utils.License",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "string",
                 "name": "_name",
                 "type": "string"
@@ -9,6 +78,11 @@
             {
                 "internalType": "string",
                 "name": "_version",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "_image",
                 "type": "string"
             },
             {
@@ -37,73 +111,6 @@
     },
     {
         "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "name": "adminChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "baseLicenseTimeChanged",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "numCycles",
-                "type": "uint256"
-            }
-        ],
-        "name": "createLicense",
-        "outputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "uint256",
-                        "name": "id",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "issue_timestamp",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "expiration_timestamp",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "owner",
-                        "type": "address"
-                    }
-                ],
-                "internalType": "struct Software.License",
-                "name": "",
-                "type": "tuple"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "anonymous": false,
         "inputs": [],
         "name": "deleted",
         "type": "event"
@@ -119,32 +126,10 @@
         "anonymous": false,
         "inputs": [
             {
-                "components": [
-                    {
-                        "internalType": "uint256",
-                        "name": "id",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "issue_timestamp",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "expiration_timestamp",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "owner",
-                        "type": "address"
-                    }
-                ],
                 "indexed": false,
-                "internalType": "struct Software.License",
+                "internalType": "uint256",
                 "name": "",
-                "type": "tuple"
+                "type": "uint256"
             }
         ],
         "name": "licenceDeleted",
@@ -161,6 +146,11 @@
                         "type": "uint256"
                     },
                     {
+                        "internalType": "address",
+                        "name": "softwareAddress",
+                        "type": "address"
+                    },
+                    {
                         "internalType": "uint256",
                         "name": "issue_timestamp",
                         "type": "uint256"
@@ -171,13 +161,23 @@
                         "type": "uint256"
                     },
                     {
-                        "internalType": "address",
+                        "internalType": "address payable",
                         "name": "owner",
                         "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isForResale",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "resalePrice",
+                        "type": "uint256"
                     }
                 ],
                 "indexed": false,
-                "internalType": "struct Software.License",
+                "internalType": "struct Utils.License",
                 "name": "",
                 "type": "tuple"
             }
@@ -190,12 +190,24 @@
         "inputs": [
             {
                 "indexed": false,
-                "internalType": "string",
+                "internalType": "address",
                 "name": "",
-                "type": "string"
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
-        "name": "nameChanged",
+        "name": "licenseChangeOwner",
         "type": "event"
     },
     {
@@ -208,7 +220,20 @@
                 "type": "uint256"
             }
         ],
-        "name": "priceChanged",
+        "name": "licenseForSale",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "licenseForSaleRevoke",
         "type": "event"
     },
     {
@@ -229,6 +254,11 @@
                         "type": "uint256"
                     },
                     {
+                        "internalType": "address",
+                        "name": "softwareAddress",
+                        "type": "address"
+                    },
+                    {
                         "internalType": "uint256",
                         "name": "issue_timestamp",
                         "type": "uint256"
@@ -239,12 +269,22 @@
                         "type": "uint256"
                     },
                     {
-                        "internalType": "address",
+                        "internalType": "address payable",
                         "name": "owner",
                         "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isForResale",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "resalePrice",
+                        "type": "uint256"
                     }
                 ],
-                "internalType": "struct Software.License",
+                "internalType": "struct Utils.License",
                 "name": "",
                 "type": "tuple"
             }
@@ -253,14 +293,58 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "remove_all_licenses",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
-                "internalType": "address payable",
-                "name": "_admin",
-                "type": "address"
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "softwareAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "issue_timestamp",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "expiration_timestamp",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address payable",
+                        "name": "owner",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isForResale",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "resalePrice",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct Utils.License",
+                "name": "_license",
+                "type": "tuple"
             }
         ],
-        "name": "set_admin",
+        "name": "remove_license",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -269,11 +353,11 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "_baseLicenseTime",
+                "name": "index",
                 "type": "uint256"
             }
         ],
-        "name": "set_baseLicenseTime",
+        "name": "remove_license",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -281,25 +365,17 @@
     {
         "inputs": [
             {
-                "internalType": "string",
-                "name": "_name",
-                "type": "string"
-            }
-        ],
-        "name": "set_name",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
+                "internalType": "uint256",
+                "name": "_licenseId",
+                "type": "uint256"
+            },
             {
                 "internalType": "uint256",
                 "name": "_price",
                 "type": "uint256"
             }
         ],
-        "name": "set_price",
+        "name": "resaleLicense",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -307,12 +383,12 @@
     {
         "inputs": [
             {
-                "internalType": "string",
-                "name": "_version",
-                "type": "string"
+                "internalType": "uint256",
+                "name": "_licenseId",
+                "type": "uint256"
             }
         ],
-        "name": "set_version",
+        "name": "revokeForSaleLicense",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -322,13 +398,123 @@
         "inputs": [
             {
                 "indexed": false,
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
+                "indexed": false,
                 "internalType": "string",
                 "name": "",
                 "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
         ],
-        "name": "versionChanged",
+        "name": "softwareInformationChanged",
         "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_from",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_licenseId",
+                "type": "uint256"
+            }
+        ],
+        "name": "transferLicense",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address payable",
+                "name": "_admin",
+                "type": "address"
+            },
+            {
+                "internalType": "string",
+                "name": "_name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "_version",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "_image",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_price",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_baseLicenseTime",
+                "type": "uint256"
+            }
+        ],
+        "name": "update_information",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_licenseId",
+                "type": "uint256"
+            }
+        ],
+        "name": "updateLicense",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
         "inputs": [],
@@ -357,25 +543,6 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "adr",
-                "type": "address"
-            }
-        ],
-        "name": "check_license",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "check_license_v2",
         "outputs": [
@@ -392,6 +559,11 @@
         "inputs": [],
         "name": "get_informations",
         "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            },
             {
                 "internalType": "string",
                 "name": "",
@@ -443,6 +615,11 @@
                         "type": "uint256"
                     },
                     {
+                        "internalType": "address",
+                        "name": "softwareAddress",
+                        "type": "address"
+                    },
+                    {
                         "internalType": "uint256",
                         "name": "issue_timestamp",
                         "type": "uint256"
@@ -453,12 +630,72 @@
                         "type": "uint256"
                     },
                     {
-                        "internalType": "address",
+                        "internalType": "address payable",
                         "name": "owner",
                         "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isForResale",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "resalePrice",
+                        "type": "uint256"
                     }
                 ],
-                "internalType": "struct Software.License[]",
+                "internalType": "struct Utils.License[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "get_licenses_resale",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "softwareAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "issue_timestamp",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "expiration_timestamp",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address payable",
+                        "name": "owner",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isForResale",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "resalePrice",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct Utils.License[]",
                 "name": "",
                 "type": "tuple[]"
             }
@@ -484,6 +721,11 @@
                         "type": "uint256"
                     },
                     {
+                        "internalType": "address",
+                        "name": "softwareAddress",
+                        "type": "address"
+                    },
+                    {
                         "internalType": "uint256",
                         "name": "issue_timestamp",
                         "type": "uint256"
@@ -494,12 +736,22 @@
                         "type": "uint256"
                     },
                     {
-                        "internalType": "address",
+                        "internalType": "address payable",
                         "name": "owner",
                         "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isForResale",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "resalePrice",
+                        "type": "uint256"
                     }
                 ],
-                "internalType": "struct Software.License[]",
+                "internalType": "struct Utils.License[]",
                 "name": "",
                 "type": "tuple[]"
             }
@@ -510,6 +762,38 @@
     {
         "inputs": [],
         "name": "get_nb_license",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "image",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "licenseIdIndex",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -536,6 +820,11 @@
                 "type": "uint256"
             },
             {
+                "internalType": "address",
+                "name": "softwareAddress",
+                "type": "address"
+            },
+            {
                 "internalType": "uint256",
                 "name": "issue_timestamp",
                 "type": "uint256"
@@ -546,9 +835,19 @@
                 "type": "uint256"
             },
             {
-                "internalType": "address",
+                "internalType": "address payable",
                 "name": "owner",
                 "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "isForResale",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "resalePrice",
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -596,6 +895,11 @@
                 "type": "uint256"
             },
             {
+                "internalType": "address",
+                "name": "softwareAddress",
+                "type": "address"
+            },
+            {
                 "internalType": "uint256",
                 "name": "issue_timestamp",
                 "type": "uint256"
@@ -606,9 +910,19 @@
                 "type": "uint256"
             },
             {
-                "internalType": "address",
+                "internalType": "address payable",
                 "name": "owner",
                 "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "isForResale",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "resalePrice",
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",

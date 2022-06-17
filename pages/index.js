@@ -47,33 +47,36 @@ export default function Home() {
   const [isChecking, setIsChecking] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const [parameters, setParameters] = useState({
+    softwareContractAdr: "",
+    redirectURI: "",
+  });
   // const { softwareContractAdr, redirectURI } = router.query;
   const [wallet, setWallet] = useState({
     email: "",
     address: "",
-    softwareAdr: "",
   });
-  // console.log("Request: ,", req);
-  // if (softwareContractAdr === undefined || redirectURI === undefined)
-  let softwareContractAdr, redirectURI;
 
-  // useEffect(() => {
-  //   if (!router.isReady) return;
-  //   softwareContractAdr = router.query.softwareContractAdr;
-  //   redirectURI = router.query.redirectURI;
-  // }, [router.isReady]);
+  // let softwareContractAdr, redirectURI;
 
   useEffect(() => {
     if (!router.isReady) return;
-    softwareContractAdr = router.query.softwareContractAdr;
-    redirectURI = router.query.redirectURI;
-    if (softwareContractAdr !== undefined && redirectURI !== undefined) {
+    setParameters({
+      softwareContractAdr: router.query.softwareContractAdr,
+      redirectURI: router.query.redirectURI,
+    });
+    // softwareContractAdr = router.query.softwareContractAdr;
+    // redirectURI = router.query.redirectURI;
+    if (
+      router.query.softwareContractAdr !== undefined &&
+      router.query.redirectURI !== undefined
+    ) {
       const web3 = new Web3(portis.provider);
       let softwareContract = null;
       try {
         softwareContract = new web3.eth.Contract(
           softwareContractABI,
-          softwareContractAdr
+          router.query.softwareContractAdr
         );
       } catch (error) {
         setError("Invalid software address");
@@ -114,7 +117,6 @@ export default function Home() {
           setWallet({
             email,
             address: web3.utils.toChecksumAddress(walletAddress),
-            softwareAdr: softwareContract._address,
           });
 
           setIsChecking(true);
@@ -128,7 +130,7 @@ export default function Home() {
                 setIsValid(false);
               }
               setIsChecking(false);
-              await fetch(redirectURI, {
+              await fetch(router.query.redirectURI, {
                 method: "POST",
                 mode: "no-cors",
                 headers: {
@@ -156,7 +158,7 @@ export default function Home() {
       setLoading(false);
       setError("Invalid parameters");
     }
-  }, [softwareContractAdr, portis, router.isReady]);
+  }, [portis, router.isReady]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -181,7 +183,7 @@ export default function Home() {
             </Box>
           ) : !error ? (
             <>
-              {wallet.softwareAdr && (
+              {parameters.softwareContractAdr && (
                 <>
                   <Typography variant="h4" color="common.white">
                     Software Address
@@ -198,7 +200,7 @@ export default function Home() {
                     }}
                   >
                     <p style={{ padding: 0, margin: 0, color: "white" }}>
-                      {wallet.softwareAdr}
+                      {parameters.softwareContractAdr}
                     </p>
                   </Box>
                 </>
@@ -253,12 +255,14 @@ export default function Home() {
                                 src={"/img/icons8-ok-96.png"}
                                 height="30"
                                 width="30"
+                                alt=""
                               />
                             ) : (
                               <Image
                                 src={"/img/icons8-cancel-48.png"}
                                 height="30"
                                 width="30"
+                                alt=""
                               />
                             )
                           ) : (
@@ -320,6 +324,7 @@ export default function Home() {
                 src={"/img/icons8-high-priority-96.png"}
                 height="60"
                 width="60"
+                alt=""
               />
 
               {` ERROR: ${error}`}
