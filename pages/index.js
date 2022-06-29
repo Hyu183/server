@@ -298,7 +298,7 @@ export default function Home() {
                     <Typography variant="h4" color="red">
                       You have no valid license.{" "}
                       <Link
-                        href={`https://softwarelicenseblockchainmain.gtsb.io/?software=${wallet.softwareAdr}`}
+                        href={`https://softwarelicenseblockchainmain.gtsb.io/?softwareAdr=${parameters.softwareContractAdr}`}
                         underline="always"
                       >
                         Click here to buy!
